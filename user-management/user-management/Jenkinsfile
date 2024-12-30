@@ -4,14 +4,14 @@ pipeline {
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('0b0a1a91-adc5-41b8-a831-75804f20787e') // Add your Docker Hub credentials in Jenkins
         //REMOTE_SERVER_CREDENTIALS = credentials('remote-server-credentials') // Add your remote server credentials
-        IMAGE_NAME = 'your-dockerhub-username/your-image-name'
+        IMAGE_NAME = 'alios18/jenkins-project'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
                 echo 'Cloning the repository...'
-                git branch: 'main', url: 'https://github.com/ouezghari-med-ali/Jenkins_Project'
+                git branch: 'main', url: 'https://github.com/ouezghari-med-ali/Jenkins_Project.git'
             }
         }
 
