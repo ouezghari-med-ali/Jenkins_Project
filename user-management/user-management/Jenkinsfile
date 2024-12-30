@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('0b0a1a91-adc5-41b8-a831-75804f20787e')
-        //REMOTE_SERVER_CREDENTIALS = credentials('remote-server-credentials') // Add your remote server credentials
         IMAGE_NAME = 'alios18/jenkins-project'
     }
 
@@ -18,20 +17,20 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building the project...'
-                bat '''
+                bat """
                 cd user-management/user-management
                 mvn clean package
-                '''
+                """
             }
         }
 
         stage('Unit Tests') {
             steps {
                 echo 'Running unit tests...'
-                bat '''
+                bat """
                 cd user-management/user-management
                 mvn test
-                '''
+                """
                 junit '**/user-management/user-management/target/surefire-reports/*.xml'
             }
         }
@@ -39,41 +38,24 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
-                bat '''
+                bat """
                 cd user-management/user-management
-                docker build -t ${IMAGE_NAME} .
-                '''
+                docker build -t ${env.IMAGE_NAME} .
+                """
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
                 echo 'Pushing Docker image to Docker Hub...'
-                bat '''
+                bat """
                 docker login -u ${DOCKER_HUB_CREDENTIALS_USR} -p ${DOCKER_HUB_CREDENTIALS_PSW}
-                docker push ${IMAGE_NAME}
-                '''
+                docker push ${env.IMAGE_NAME}
+                """
             }
         }
-        // Uncomment and update the following section if deploying to a remote server
-        /*
-        stage('Deploy to Remote Server') {
-            steps {
-                echo 'Deploying to remote server...'
-                sshagent(credentials: ['remote-server-credentials']) {
-                    sh """
-                    ssh -o StrictHostKeyChecking=no ${REMOTE_SERVER_CREDENTIALS_USR}@remote-server-ip << EOF
-                    docker pull ${IMAGE_NAME}
-                    docker stop your-container-name || true
-                    docker rm your-container-name || true
-                    docker run -d --name your-container-name -p 80:80 ${IMAGE_NAME}
-                    EOF
-                    """
-                }
-            }
-        }
-        */
     }
+
     post {
         always {
             echo 'Cleaning up workspace...'
