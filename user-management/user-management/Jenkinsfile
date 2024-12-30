@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('0b0a1a91-adc5-41b8-a831-75804f20787e') // Add your Docker Hub credentials in Jenkins
+        DOCKER_HUB_CREDENTIALS = credentials('0b0a1a91-adc5-41b8-a831-75804f20787e') // Docker Hub credentials
         //REMOTE_SERVER_CREDENTIALS = credentials('remote-server-credentials') // Add your remote server credentials
         IMAGE_NAME = 'alios18/jenkins-project'
     }
@@ -18,15 +18,15 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building the project...'
-                sh 'mvn clean package' // Replace with your build command
+                sh 'mvn clean package' // Ensure Maven is installed on the Jenkins node
             }
         }
 
         stage('Unit Tests') {
             steps {
                 echo 'Running unit tests...'
-                sh 'mvn test' // Replace with your test command
-                junit '**/build/test-results/**/*.xml' // Specify the test result location
+                sh 'mvn test' // Ensure the test results are configured properly
+                junit '**/target/surefire-reports/*.xml' // Adjust the path to your Maven test reports
             }
         }
 
@@ -49,7 +49,9 @@ pipeline {
             }
         }
 
-/*        stage('Deploy to Remote Server') {
+        // Uncomment and update the following section if deploying to a remote server
+        /*
+        stage('Deploy to Remote Server') {
             steps {
                 echo 'Deploying to remote server...'
                 sshagent(credentials: ['remote-server-credentials']) {
@@ -61,9 +63,10 @@ pipeline {
                     docker run -d --name your-container-name -p 80:80 ${IMAGE_NAME}
                     EOF
                     """
-                }*/
+                }
             }
         }
+        */
     }
 
     post {
