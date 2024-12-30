@@ -18,37 +18,43 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building the project...'
-                bat 'cd user-management/user-management && mvn clean package' // Replace `sh` with `bat` for Windows
+                bat '''
+                cd user-management/user-management
+                mvn clean package
+                '''
             }
         }
 
         stage('Unit Tests') {
             steps {
                 echo 'Running unit tests...'
-                bat 'mvn test' // Replace `sh` with `bat`
-                junit '**/target/surefire-reports/*.xml'
+                bat '''
+                cd user-management/user-management
+                mvn test
+                '''
+                junit '**/user-management/user-management/target/surefire-reports/*.xml'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
-                bat """
+                bat '''
+                cd user-management/user-management
                 docker build -t ${IMAGE_NAME} .
-                """
+                '''
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
                 echo 'Pushing Docker image to Docker Hub...'
-                bat """
-                echo ${DOCKER_HUB_CREDENTIALS_PSW} | docker login -u ${DOCKER_HUB_CREDENTIALS_USR} --password-stdin
+                bat '''
+                docker login -u ${DOCKER_HUB_CREDENTIALS_USR} -p ${DOCKER_HUB_CREDENTIALS_PSW}
                 docker push ${IMAGE_NAME}
-                """
+                '''
             }
         }
-
         // Uncomment and update the following section if deploying to a remote server
         /*
         stage('Deploy to Remote Server') {
@@ -68,7 +74,6 @@ pipeline {
         }
         */
     }
-
     post {
         always {
             echo 'Cleaning up workspace...'
