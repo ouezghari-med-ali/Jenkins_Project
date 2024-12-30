@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('0b0a1a91-adc5-41b8-a831-75804f20787e') // Docker Hub credentials
+        DOCKER_HUB_CREDENTIALS = credentials('0b0a1a91-adc5-41b8-a831-75804f20787e')
         //REMOTE_SERVER_CREDENTIALS = credentials('remote-server-credentials') // Add your remote server credentials
         IMAGE_NAME = 'alios18/jenkins-project'
     }
@@ -18,15 +18,13 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building the project...'
-                sh 'mvn clean package' // Ensure Maven is installed on the Jenkins node
+                bat 'mvn clean package' // Replace `sh` with `bat` for Windows
             }
         }
 
         stage('Unit Tests') {
             steps {
                 echo 'Running unit tests...'
-                sh 'mvn test' // Ensure the test results are configured properly
-                junit '**/target/surefire-reports/*.xml' // Adjust the path to your Maven test reports
                 bat 'mvn test' // Replace `sh` with `bat`
                 junit '**/target/surefire-reports/*.xml'
             }
