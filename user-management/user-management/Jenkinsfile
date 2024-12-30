@@ -1,25 +1,81 @@
 pipeline {
     agent any
+
+    environment {
+        DOCKER_HUB_CREDENTIALS = credentials('0b0a1a91-adc5-41b8-a831-75804f20787e') // Add your Docker Hub credentials in Jenkins
+        //REMOTE_SERVER_CREDENTIALS = credentials('remote-server-credentials') // Add your remote server credentials
+        IMAGE_NAME = 'your-dockerhub-username/your-image-name'
+    }
+
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
-                git 'https://github.com/your-repo/spring-project.git'
+                echo 'Cloning the repository...'
+                git branch: 'main', url: 'https://github.com/ouezghari-med-ali/Jenkins_Project'
             }
         }
+
         stage('Build') {
             steps {
-                bat 'mvnw clean install'
+                echo 'Building the project...'
+                sh 'mvn clean package' // Replace with your build command
             }
         }
-        stage('Test') {
+
+        stage('Unit Tests') {
             steps {
-                bat 'mvnw test'
+                echo 'Running unit tests...'
+                sh 'mvn test' // Replace with your test command
+                junit '**/build/test-results/**/*.xml' // Specify the test result location
             }
         }
-        stage('Deploy') {
+
+        stage('Build Docker Image') {
             steps {
-                bat 'deploy.bat' // Replace with your deployment script
+                echo 'Building Docker image...'
+                sh """
+                docker build -t ${IMAGE_NAME} .
+                """
             }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                echo 'Pushing Docker image to Docker Hub...'
+                sh """
+                echo ${DOCKER_HUB_CREDENTIALS_PSW} | docker login -u ${DOCKER_HUB_CREDENTIALS_USR} --password-stdin
+                docker push ${IMAGE_NAME}
+                """
+            }
+        }
+
+/*        stage('Deploy to Remote Server') {
+            steps {
+                echo 'Deploying to remote server...'
+                sshagent(credentials: ['remote-server-credentials']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${REMOTE_SERVER_CREDENTIALS_USR}@remote-server-ip << EOF
+                    docker pull ${IMAGE_NAME}
+                    docker stop your-container-name || true
+                    docker rm your-container-name || true
+                    docker run -d --name your-container-name -p 80:80 ${IMAGE_NAME}
+                    EOF
+                    """
+                }*/
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up workspace...'
+            cleanWs()
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }

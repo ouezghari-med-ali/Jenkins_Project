@@ -22,4 +22,12 @@
   "id" : 6,
   "name" : "Jane Doe",
   "email" : "jane.doe@example.com"
+}, {
+  "id" : 7,
+  "name" : "John Doe",
+  "email" : "john.doe@example.com"
+}, {
+  "id" : 8,
+  "name" : "Jane Doe",
+  "email" : "jane.doe@example.com"
 } ]
