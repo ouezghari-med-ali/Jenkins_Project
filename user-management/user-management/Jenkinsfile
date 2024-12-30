@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/your-repo/spring-project.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                bat 'mvnw clean install'
+            }
+        }
+        stage('Test') {
+            steps {
+                bat 'mvnw test'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                bat 'deploy.bat' // Replace with your deployment script
+            }
+        }
+    }
+}
