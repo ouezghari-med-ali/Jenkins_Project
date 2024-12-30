@@ -18,7 +18,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building the project...'
-                bat 'mvn clean package' // Replace `sh` with `bat` for Windows
+                bat 'cd user-management/user-management && mvn clean package' // Replace `sh` with `bat` for Windows
             }
         }
 
